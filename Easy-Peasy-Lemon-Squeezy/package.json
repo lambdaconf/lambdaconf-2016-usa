@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "pulp": "^8.1.1",
+    "purescript": "0.8.5"
+  }
+}

@@ -1,0 +1,4 @@
+#!/bin/sh
+pulp build
+pulp browserify > game.js
+open game.html

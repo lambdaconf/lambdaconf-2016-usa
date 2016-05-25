@@ -1,0 +1,35 @@
+{
+  "name": "intro-purescript",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "tmp",
+    "bower.json",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-integers": "^0.2.1",
+    "purescript-exceptions": "^0.3.4",
+    "purescript-arrays": "^0.4.5",
+    "purescript-strings": "~0.4.5",
+    "purescript-math": "^1.0.0",
+    "purescript-lists": "^0.7.10",
+    "purescript-tuples": "^0.4.0",
+    "purescript-either": "^0.2.3",
+    "purescript-maybe": "^0.3.5",
+    "purescript-foldable-traversable": "^0.4.2",
+    "purescript-control": "^0.3.2",
+    "purescript-string-parsers": "^0.6.7",
+    "purescript-transformers": "^0.8.4",
+    "purescript-functions": "^0.1.0"
+  },
+  "resolutions": {
+    "purescript-math": "^1.0.0",
+    "purescript-strings": "~0.7.0",
+    "purescript-control": "~0.3.1",
+    "purescript-maybe": "~0.3.4"
+  }
+}
