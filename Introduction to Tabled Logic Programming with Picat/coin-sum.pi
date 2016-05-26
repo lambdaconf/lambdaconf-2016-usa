@@ -11,7 +11,7 @@ main =>
     Possible = [to_int(C) : C in read_line().split()],
     get_global_map().put(possible, Possible),
     Sum = read_int(),
-    if (coins(Sum, Count) then
+    if coins(Sum, Count) then
         println(Count)
     else
         println("IMPOSSIBLE")
