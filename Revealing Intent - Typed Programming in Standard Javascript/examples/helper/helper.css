@@ -1,0 +1,50 @@
+button {
+    background-color: transparent;
+    border: 2px solid #ccc;
+    color: #ccc;
+    font-size: 22px;
+    padding: 12px;
+    float: right;
+}
+
+.output-div {
+    text-align: left;
+    font-size: 28px !important;
+    width: 100%;
+    height: 80%;
+    position: absolute;
+    padding: 45px !important;
+}
+
+.output-div:before {
+    content: "Execution Output";
+    font-size: 36px;
+    margin-bottom: 35px;
+    display: block;
+    text-align: center !important;
+}
+
+pre {
+    padding: 0 !important;
+}
+
+.code-wrapper code {
+    margin: 0 !important;
+}
+
+.output-wrapper {
+    display: none;
+    height: 525px;
+    width: 100%;
+    position: absolute;
+    z-index: 10000;
+}
+
+.modal-overlay {
+    height: 100%;
+    width: 105%;
+    position: absolute;
+    opacity: 0.9;
+    background-color: #000;
+    border: 1px solid #aaa !important;
+}
