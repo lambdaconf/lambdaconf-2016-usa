@@ -1,0 +1,28 @@
+table(+,+,min)
+edit(I, J, Dist) =>
+    S = get_global_map().get(str),
+    G = get_global_map().get(goal),
+    N = length(S), M = length(G),
+    (
+        I <= N, J <= M,
+        edit(I + 1, J + 1, NextDist),
+        Dist = abs(ord(S[I]) - ord(G[J])) + NextDist
+    ;
+        I <= N,
+        edit(I + 1, J, NextDist),
+        Dist = ord(S[I]) - 0'a + 1 + NextDist
+    ;
+        J <= M,
+        edit(I, J + 1, NextDist),
+        Dist = ord(G[J]) - 0'a + 1 + NextDist
+    ;
+        I > N, J > M,
+        Dist = 0
+    ).
+
+main =>
+    S = read_line(), G = read_line(),
+    get_global_map().put(str, to_array(S)),
+    get_global_map().put(goal, to_array(G)),
+    edit(1, 1, Dist),
+    println(Dist).

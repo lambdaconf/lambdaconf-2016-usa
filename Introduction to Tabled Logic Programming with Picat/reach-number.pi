@@ -1,0 +1,19 @@
+import planner.
+
+final((Curr, Goal)) =>
+    Curr == Goal.
+
+action((Curr, Goal), NewState, Action, Cost) ?=>
+    Action = double,
+    Cost = 1,
+    NewState = (2 * Curr, Goal).
+
+action((Curr, Goal), NewState, Action, Cost) =>
+    Action = decrement,
+    Cost = 1,
+    NewState = (Curr - 1, Goal).
+
+main =>
+    Goal = read_int(),
+    best_plan((1, Goal), Plan),
+    println(Plan).

@@ -1,0 +1,18 @@
+import util.
+
+% TODO: add table declaration
+coins(0, Count) =>
+    Count = 0.
+coins(Sum, Count) =>
+    Possible = get_global_map().get(possible),
+    % TODO: complete this (about 4 lines)
+
+main =>
+    Possible = [to_int(C) : C in read_line().split()],
+    get_global_map().put(possible, Possible),
+    Sum = read_int(),
+    if (coins(Sum, Count) then
+        println(Count)
+    else
+        println("IMPOSSIBLE")
+    end.
