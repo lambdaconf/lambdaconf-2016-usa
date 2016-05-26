@@ -1,0 +1,62 @@
+import planner.
+import util.
+
+final((_R, _C, W, I)) => I == W.length().
+
+action((0, 0, W, 0), NewState, Action, Cost) =>
+    Board = get_global_map().get(board),
+    MaxR = Board.length(),
+    MaxC = Board[1].length(),
+    between(1, MaxR, NewR),
+    between(1, MaxC, NewC),
+    Board[NewR, NewC] == W[1],
+    Cost = 1,
+    Action = (NewR, NewC),
+    NewState = (NewR, NewC, W, 1).
+
+action((R, C, W, I), NewState, Action, Cost) =>
+    Board = get_global_map().get(board),
+    MaxR = Board.length(),
+    MaxC = Board[1].length(),
+    I > 0, I < W.length(),
+    member((Rd, Cd), [(0, 1), (1, 0), (0, -1), (-1, 0),
+                      (-1, -1), (-1, 1), (1, -1), (1, 1)]),
+    NewR = R + Rd,
+    NewC = C + Cd,
+    NewI = I + 1,
+    NewR > 0, NewC > 0, NewR <= MaxR, NewC <= MaxC,
+    Board[NewR, NewC] ==  W[NewI],
+    Cost = 1,
+    Action = (NewR, NewC),
+    NewState = (NewR, NewC, W, NewI).
+
+main =>
+    MaxR = read_int(), MaxC = read_int(),
+    Board = new_array(MaxR, MaxC),
+    foreach (R in 1..MaxR)
+        Line = read_line(),
+        foreach (C in 1..MaxC)
+           Board[R, C] = Line[C]
+        end,
+        get_global_map().put(board, Board)
+    end,
+    _ = read_line(),
+    Word = to_array(read_line()),
+    (
+        best_plan_nondet((0, 0, Word, 0), Plan),
+        foreach (R in 1..MaxR)
+            foreach (C in 1..MaxC)
+                if membchk((R, C), Plan) then
+                    Board = get_global_map().get(board),
+                    print(Board[R, C])
+                else
+                    print(".")
+                end
+            end,
+            nl
+        end,
+        nl,
+        fail
+    ;
+       true
+    ).
