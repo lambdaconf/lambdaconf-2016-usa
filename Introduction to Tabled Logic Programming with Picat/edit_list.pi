@@ -1,0 +1,17 @@
+% this is the list version (vs array version) of edit.pi
+table(+,+,min)
+edit([], [], Dist) => Dist = 0.
+edit([Sfirst | Srest], [Gfirst | Grest], Dist) ?=>
+    edit(Srest, Grest, NextDist),
+    Dist = abs(ord(Sfirst) - ord(Gfirst)) + NextDist.
+edit([Sfirst | Srest], G, Dist) ?=>
+    edit(Srest, G, NextDist),
+    Dist = abs(ord(Sfirst) - 0'a + 1) + NextDist.
+edit(S, [Gfirst | Grest], Dist) =>
+    edit(S, Grest, NextDist),
+    Dist = abs(ord(Gfirst) - 0'a + 1) + NextDist.
+
+main =>
+    S = read_line(), G = read_line(),
+    edit(S, G, Dist),
+    println(Dist).
