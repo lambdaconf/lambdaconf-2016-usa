@@ -1,0 +1,211 @@
+.reveal > .slides > section > .demo {
+    text-align: left;
+    background-color: #f5f5f5;
+    margin: 0.3em auto;
+    max-width: 840px;
+    padding: 0.4em;
+    border: 2px solid #ccc;
+    border-bottom: 2px solid #888;
+    font-size: 0.8em;
+}
+
+.reveal > .slides > section > .demo-flarecheck {
+    text-align: left;
+    margin: 0.3em auto;
+    max-width: 840px;
+    padding: 0.4em;
+    font-size: 0.8em;
+}
+
+.reveal > .slides > section > .demo > .out {
+    font-weight: bold;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > label {
+    text-align: left;
+    display: inline-block;
+    width: 7em;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input {
+    margin-bottom: 0.2em;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > .flare-input-boolean {
+    width: 25px;
+    height: 25px;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > input {
+    border: 2px solid black;
+    font-family: inherit;
+    padding-left: 0.5ex;
+    font-size: inherit;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > input[type="color"] {
+    border: none;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > button {
+    border: 2px solid black;
+    font-family: inherit;
+    padding-left: 0.5ex;
+    font-size: inherit;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > .flare-input-int-number,
+.reveal > .slides > section > .demo > div > .flare-input > .flare-input-int {
+    width: 3em;
+}
+
+.reveal > .slides > section > .demo > div > .flare-input > input:invalid {
+    background-color: #cc9393;
+}
+
+#inp_superformula > .flare-input {
+    margin: 0 !important;
+}
+
+/* fieldset { */
+/*     border: none; */
+/*     padding: 0px; */
+/* } */
+
+/* fieldset legend { */
+/*     padding: 0px; */
+/*     width: 100px; */
+/*     float: left; */
+/* } */
+
+/* fieldset label { */
+/*     margin-right: 10px; */
+/*     cursor: pointer; */
+/* } */
+
+.flarecheck-test pre,
+.flarecheck-test code,
+.flarecheck-test input,
+.flarecheck-test label,
+.flarecheck-test legend,
+.flarecheck-test select {
+    font-family: 'Source Code Pro', courier;
+}
+
+fieldset.flarecheck-test {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 40px;
+    max-width: 810px;
+    border: 2px solid #888;
+    border-radius: 6px;
+    padding: 20px;
+}
+
+fieldset.flarecheck-test > legend {
+    display: none;
+}
+
+.flarecheck-test pre {
+    background-color: #ffffff;
+    padding: 10px;
+    width: inherit;
+    font-size: inherit;
+
+    /* http://stackoverflow.com/a/248013/704831 */
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.flarecheck-test .flare-input {
+    margin-bottom: 5px;
+}
+
+.flarecheck-test input:not([type="range"]) {
+    font-size: inherit;
+    padding: 3px;
+    border-radius: 3px;
+    border: 2px solid #888;
+}
+
+.flarecheck-test input:invalid {
+    background-color: #cc9393;
+}
+
+.flarecheck-test .flare-input-number,
+.flarecheck-test .flare-input-int-number {
+    width: 3em;
+}
+
+.flarecheck-test fieldset {
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.flarecheck-test label {
+    width: 7em;
+    display: inline-block;
+}
+
+.flarecheck-test legend {
+    display: none;
+    /* padding: 2px 6px; */
+    /* font-weight: 700; */
+}
+
+.flarecheck-test .flarecheck-okay {
+    background-color: #B4DEAF;
+}
+
+.flarecheck-test .flarecheck-warn {
+    background-color: #DEAFB4;
+}
+
+.flarecheck-string {
+    color: #E91E63;
+}
+
+.flarecheck-number {
+    color: #1339E8;
+}
+
+.flarecheck-boolean {
+    font-weight: bold;
+}
+
+.flarecheck-constructor {
+    font-weight: bold;
+}
+
+.flarecheck-record-field {
+    font-style: italic;
+}
+
+.flarecheck-tooltip {
+    cursor: default;
+}
+
+.flarecheck-tooltip:hover {
+    background-color: #f2e7a6;
+}
+
+.flarecheck-tooltip > .flarecheck-tooltip:hover {
+    background-color: #e9d563;
+}
+
+.flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip:hover {
+    background-color: #dfc220;
+}
+
+.flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip:hover {
+    background-color: #938015;
+}
+
+.flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip > .flarecheck-tooltip:hover {
+    background-color: #62560e;
+}
+
