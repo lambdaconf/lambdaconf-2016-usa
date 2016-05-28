@@ -1,4 +1,4 @@
-#r "../packages/FSharp.Data.SqlClient.1.8.1/lib/net40/FSharp.Data.SqlClient.dll"
+#r "packages/FSharp.Data.SqlClient/lib/net40/FSharp.Data.SqlClient.dll"
 open System
 open FSharp.Data
 
