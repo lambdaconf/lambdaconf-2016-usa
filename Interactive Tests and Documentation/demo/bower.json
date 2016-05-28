@@ -1,0 +1,12 @@
+{
+  "name": "flare-example",
+  "dependencies": {
+    "purescript-flare": "^0.5.1",
+    "purescript-colors": "^0.4.4"
+  },
+  "resolutions": {
+    "purescript-colors": "^0.4.4",
+    "purescript-strings": "^0.7.1",
+    "purescript-canvas": "^0.4.0"
+  }
+}

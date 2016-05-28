@@ -1,0 +1,753 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Revealing Intent or Typed Programming in Standard Javascript</title>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/black.css">
+	<link rel="stylesheet" href="examples/helper/helper.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/monokai-sublime.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+
+	<script src="examples/helper/helper.js"></script>
+	<script src="examples/src/signet/signet.js"></script>
+	<script src="examples/src/examples.js"></script>
+
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h1>Revealing Intent</h1>
+				<h4>or</h4>
+				<h3>Typed Programming in Standard Javascript</h3>
+			</section>
+
+			<section>
+				<h3>What We'll Cover</h3>
+				
+				<section>
+					<ul>
+						<li>Types and Type Definitions</li>
+						<li>Predicates as Types</li>
+						<li>Subsets and Subtypes</li>
+						<li>Higher-Kinded Types</li>
+						<li>Building a Domain Model</li>
+					</ul>
+				</section>
+			</section>
+			
+			<section>
+				<h3>What I Used</h3>
+				
+				<section>
+					<ul>
+						<li>ECMAScript 5.1 Strict</li>
+						<li>Signet Type Library (<a href="http://www.npmjs.com/package/signet" target="_blank">npmjs.com/package/signet</a>)</li>
+						<li>A live code runner (in presentation source)</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h3>These Slides are Available Online</h3>
+				
+				<section>
+					<ul>
+						<li>On my site: <a href="http://chrisstead.com" target="_blank">chrisstead.com</a></li>
+						<li>On Github: <a href="https://github.com/cmstead/revealing-intent-presentation" target="_blank">bit.ly/revealing-intent</a></li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h2>Chris Stead</h2>
+				<h3>@cm_stead</h3>
+				<h3>chrisstead.com</h3>
+			</section>
+
+			<section>
+				<h3>A Little About Me</h3>
+
+				<ul>
+					<li>Javascript Programmer</li>
+					<li>Math Geek</li>
+					<li>Tool Builder</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Let's Look at the Gorilla in the Room</h2>
+			</section>
+
+			<section>
+
+				<h2>This is Koko</h2>
+
+				<section>
+					<img src="./images/koko_and_smoky1.jpg" alt="Koko and her cat Smoky" style="height: 400px; margin-top: 200px;" />
+				</section>
+
+			</section>
+
+			<section>
+				<h2>Fact:</h2>
+
+				<section>
+					Writing and maintaining<br />large Javascript applications is hard!
+				</section>
+			</section>
+
+			<section>
+				<h3>Reasons Javascript is Hard</h3>
+
+				<section>
+					<ul>
+						<li class="fragment">No required build step, so it's often tested at runtime</li>
+						<li class="fragment">Remembering where things are is tough</li>
+						<li class="fragment">Remembering an old function contract is impossible</li>
+					</ul>
+				</section>
+			</section>
+			
+			<section>
+				<h3>Typed Vs. Untyped</h3>
+
+				<section>
+					Javascript isn't untyped, it's, at worst, singly-typed
+				</section>
+
+				<section>
+					At its core, the Javascript base type is Object, but we could actually say the base type is "Dynamic"
+				</section>
+			</section>
+
+			<section>
+				<h3>A Simple Function</h3>
+
+				<section>
+					<pre class="code-wrapper">
+						<code>
+		function vectorAdd(v1, v2) {
+			return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+		}
+
+		vectorAdd([1, 2, 3], [4, 5, 6]);
+		vectorAdd([1, 2, 3, 4], [5, 6, 7]);
+		vectorAdd('foo', 'bar');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('basic-example', bareVectors)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="basic-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="basic-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h3>Naïve Type Checking</h3>
+
+				<section>
+					<pre class="code-wrapper">
+						<code>
+    function vectorAdd(v1, v2) {
+        throwOnArrayMismatch(v1);
+        throwOnArrayMismatch(v2);
+        
+        return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+    }
+
+	vectorAdd([1, 2, 3], [4, 5, 6]);
+	vectorAdd([1, 2, 3, 4], [5, 6, 7]);
+	vectorAdd('foo', 'bar');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('simple-check-example', simpleCheck)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="simple-check-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="simple-check-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>Functions are Data Too</h2>
+			</section>
+
+			<section>
+				<h3>Function Types are Defined by Mappings</h3>
+
+				<ul>
+					<li>f: (a => b)</li>
+					<li>x: a</li>
+					<li>(f x): b</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>Function Properties as Metadata</h3>
+
+				<section>
+					Object is the base type for all other types, including Function
+				</section>
+
+				<section>
+					We can attach function type information as a metadata string
+				</section>
+
+			</section>
+
+			<section>
+				<h3>Attaching a Signature as Metadata</h3>
+
+				<section>
+					<pre>
+						<code>
+		vectorAdd.signature = 'array, array => array';
+		
+		function vectorAdd(v1, v2) {
+			throwOnArrayMismatch(v1);
+			throwOnArrayMismatch(v2);
+			
+			return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+		}
+
+        (function (fn) { return fn.signature})(vectorAdd);
+		
+        vectorAdd([1, 2, 3], [4, 5, 6]);
+        vectorAdd([1, 2, 3, 4], [5, 6, 7]);
+        vectorAdd('foo', 'bar');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('signed-fn-example', signedFn)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="signed-fn-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="signed-fn-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>We can do better!</h2>
+			</section>
+
+			<section>
+				<h3>Enforcing Behavior with Signet</h3>
+
+				<section>
+					<pre>
+						<code>
+    var vectorAdd = signet.enforce(
+        'array, array => array',
+        function vectorAdd(v1, v2) {
+            return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+        });
+
+	(function (fn) { return fn.signature })(vectorAdd);
+	
+	vectorAdd([1, 2, 3], [4, 5, 6]);
+	vectorAdd([1, 2, 3, 4], [5, 6, 7]);
+	vectorAdd('foo', 'bar');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('signet-enforced-example', signetEnforced)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="signet-enforced-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="signet-enforced-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>Defining Types with Predicates</h2>
+			</section>
+
+			<section>
+				<h3>Functions as a Mapping Mechanism</h3>
+
+				<section>
+					Functions provide a way to map values from one set to another.
+				</section>
+
+				<section>
+					<img src="images/function-mapping.png" />
+
+					<p>&phi; is defined as follows:</p>
+
+					<ul>
+						<li>&phi;: A &rarr; B when p(x) = true</li>
+						<li>&phi;: A &rarr; B<sup>-1</sup> when p(x) = false</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h3>Types as Sets</h3>
+
+				<section>
+					A type can be considered a set to which values belong
+				</section>
+
+				<section>
+					<p>A type set can be defined with a predicate function</p>
+					<p>This rises from the Curry-Howard Isomorphism</p>
+				</section>
+
+			</section>
+
+			<section>
+				<h3>Types, Sets and Predicates</h3>
+
+				<section>
+					<ul>
+						<li class="fragment">
+							Javascript native types are named sets like these
+							<ul class="fragment">
+								<li>String</li>
+								<li>Number</li>
+								<li>...</li>
+							</ul>
+						</li>
+						<li class="fragment">
+							Predicates can extend these sets and define new types
+							<ul class="fragment">
+								<li>int</li>
+								<li>tuple</li>
+								<li>...</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h3>A Utility Function</h3>
+
+				<section>
+					<pre class="code-wrapper">
+						<code>
+	function checkType(type, value) {
+		if (!signet.isTypeOf(type)(value)) {
+			var errorMessage = 'Expected value of type ' + 
+								type + ' but got ' + 
+								typeof value + ' (' + 
+								value.toString() + ')';
+				
+			throw new Error(errorMessage);
+		}
+
+		return value.toString() + ' is of type ' + type;
+	}						</code>
+					</pre>
+				</section>
+
+			</section>
+
+			<section>
+				<h3>Building A Type With Predicates</h3>
+
+				<section>
+					<pre>
+						<code>
+    function lowerCaseType (value){
+        return typeof value === 'string' && value.toLowerCase() === value;
+    }
+    
+    signet.extend('lowerCase', lowerCaseType);
+    
+	checkType('lowerCase', 'foo'),
+	checkType('lowerCase', 'bar'),
+	checkType('lowerCase', 'BaZ'),
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('lower-case-example', lowerCaseConstruction)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="lower-case-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="lower-case-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>Type Polymorphism</h2>
+
+				<h3>The is-a relationship</h3>
+			</section>
+
+			<section>
+				<h3>Building A Type with Polymorphism</h3>
+
+				<section>
+					<p>
+						A subtype can be defined as a subset of another type
+					</p>
+
+					<p>
+						<span class="fragment">number</span>
+						<span class="fragment"> -> int</span>
+						<span class="fragment"> -> natural</span>
+						<span class="fragment"> -> age</span>
+					</p>
+				</section>
+			</section>
+
+			<section>
+				<h3>Constructing The Age Type</h3>
+
+				<section>
+					<pre class="code-wrapper">
+						<code>
+	signet.subtype('number')('int', value => value === Math.floor(value));
+	
+    signet.subtype('int')('natural', value => value >= 0;);
+	
+    signet.subtype('natural')('age', value => value <= 150;);
+						</code>
+					</pre>
+				</section>
+			</section>
+
+			<section>
+				<h3>Testing Our New Types</h3>
+
+				<section>
+					<pre class="code-wrapper">
+						<code>
+	checkType('int', 3.2);
+	checkType('int', -3);
+	checkType('natural', -3);
+	checkType('natural', 200);
+	checkType('age', 200);
+	checkType('age', 42);
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('age-construction', ageConstruction)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="age-construction-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="age-construction" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>Higher-Kinded Types</h2>
+			</section>
+
+			<section>
+				<h3>Defining A Higher-Kinded Type</h3>
+
+				<section>
+					<ul>
+						<li class="fragment">Data type</li>
+						<li class="fragment">Related to currying and partial application</li>
+						<li class="fragment">Takes a type and returns a type (* -> *) -> *</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h3>Tuple: A Higher-Kinded Type</h3>
+
+				<section>
+					<span class="fragment">Tuple</span><span class="fragment">&lt;number;number&gt;</span>
+					<span class="fragment"> -> point</span>
+				</section>
+			</section>
+
+			<section>
+				<h3>Constructing The Tuple Type</h3>
+
+				<pre class="code-wrapper">
+						<code>
+    function checkType (tuple, type, index){
+        return signet.isTypeOf(type)(tuple[index]);
+    }
+    
+    function verifyTuple (tuple, typeObj) {
+        return typeObj.valueType
+                    .map(checkType.bind(null, tuple))
+                    .reduce(function (a, b) { return a && b; }, true);
+    }
+    
+    signet.subtype('array')('tuple', tupleType);
+
+    function tupleType(tuple, typeObj) {
+        var correctLength = tuple.length === typeObj.valueType.length;
+        var correctTypes = verifyTuple(tuple, typeObj);
+        
+        return correctLength && correctTypes;
+    }
+						</code>
+					</pre>
+			</section>
+
+			<section>
+				<h3>Testing our Tuple</h3>
+				<section>
+					<pre>
+						<code>
+    signet.subtype('string')('name', function (value) {
+        return value.length < 20;
+    });
+    
+	checkType('tuple&lt;number;number&gt;', [3, 4]),
+	checkType('tuple&lt;age;name&gt;', [21, 'Bobby']),
+	checkType('tuple&lt;age;name&gt;', [5, 99])
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('tuple-construction', tupleConstruction)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="tuple-construction-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="tuple-construction" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h3>Constructing a Domain Model Hierarchy</h3>
+
+				<section>
+					<span class="fragment">string</span>
+					<span class="fragment"> -> formattedString</span><span class="fragment">&lt;^[0-9]{3}\\-[0-9]{2}\\-[0-9]{4}$&gt;</span>
+					<span class="fragment"> -> SSN</span>
+				</section>
+			</section>
+
+			<section>
+				<h3>Building A Formatted String Type</h3>
+
+				<section>
+					<pre>
+						<code>
+    signet.subtype('string')('formattedString', function (value, typeObj) {
+        var pattern = new RegExp(typeObj.valueType[0]);
+        return value.match(pattern) !== null;
+    });
+						</code>
+					</pre>
+				</section>
+			</section>
+			<section>
+				<h3>Creating Our Domain Type</h3>
+
+				<section>
+					<pre>
+						<code>
+    var ssnPattern = '^[0-9]{3}\\-[0-9]{2}\\-[0-9]{4}$';
+    var ssnDefinition = 'formattedString<' + ssnPattern + '>';
+
+    signet.alias('ssn', ssnDefinition);
+    
+	checkType('ssn', '123-45-6789');
+	checkType('ssn', '123456789');
+	checkType('ssn', 'FOO');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('formatted-string-construction', formattedStringConstruction)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="formatted-string-construction-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="formatted-string-construction" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>Everything Old is New Again</h2>
+			</section>
+
+			<section>
+				<h3>Vector Addition Revisited</h3>
+
+				<section>
+					<pre>
+						<code>
+    signet.alias('3dVector', 'tuple&lt;number;number;number&gt;');
+    
+    var vectorAdd = signet.enforce(
+		'3dVector, 3dVector => 3dVector',
+		function vectorAdd(v1, v2) {
+			return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]];
+		});
+
+	vectorAdd([1, 2, 3], [4, 5, 6]);
+	vectorAdd([1, 2, 3, 4], [5, 6, 7]);
+	vectorAdd('foo', 'bar');
+						</code>
+					</pre>
+
+					<button onclick="displayRunner('vector-addition-final', vectorAdditionFinal)">Run</button>
+
+				</section>
+
+				<div class="output-wrapper" id="vector-addition-final-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="vector-addition-final" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h2>What does it all mean?!?</h2>
+			</section>
+
+			<section>
+				<h3>Types Add Guarantees and API Reference Information</h3>
+
+				<section>
+					<ul>
+						<li class="fragment">Guarantee of correctness</li>
+						<li class="fragment">Easy inline reference for function signature</li>
+						<li class="fragment">Lasting notes for other programmers</li>
+					</ul>
+				</section>
+
+				<div class="output-wrapper" id="signet-enforced-example-wrapper">
+					<div class="modal-overlay">
+						&nbsp;
+					</div>
+					
+					<div id="signet-enforced-example" class="output-div">
+					</div>
+				</div>
+
+			</section>
+
+			<section>
+				<h3>Inline Types Fix Transpiler Type Erasure</h3>
+
+				<section>
+					When Typescript, Purescript and others are transpiled all type information is stripped
+				</section>
+			</section>
+
+			<section>
+				<h3>Types Reveal Intent</h3>
+
+				<section>
+					Type checking and annotations provide insight into how a function behaves and ensures function use matches original intent
+				</section>
+			</section>
+
+			<section>
+				<h3>When the going gets tough, the tough use types!</h3>
+			</section>
+
+			<section>
+				<h2>Chris Stead</h2>
+				<h3>@cm_stead</h3>
+				<h3>chrisstead.com</h3>
+			</section>
+
+
+		</div>
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+	<script>
+		// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+				controls: true,
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.pack.js', async: true, callback: function() { 
+						hljs.configure({
+							tabReplace: '    '
+						});
+						hljs.initHighlightingOnLoad();
+					} }
+				]
+			});
+	</script>
+</body>
+
+</html>
