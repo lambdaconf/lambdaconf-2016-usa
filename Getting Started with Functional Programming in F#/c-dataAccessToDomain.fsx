@@ -11,7 +11,6 @@ type Location = {
 }
 
 let getLocations () =
-    use query = new SqlCommandProvider<"SELECT * FROM Locations",
-                                        ConnectionString>()
+    use query = new SqlCommandProvider<"SELECT * FROM Locations", ConnectionString>()
     query.Execute()
     |> Seq.map (fun x -> { City = x.City; State = x.State })

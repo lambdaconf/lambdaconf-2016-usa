@@ -1,4 +1,4 @@
-#r "../packages/FSharp.Data.SqlClient.1.8.1/lib/net40/FSharp.Data.SqlClient.dll"
+#r "packages/FSharp.Data.SqlClient/lib/net40/FSharp.Data.SqlClient.dll"
 open System
 open FSharp.Data
 
@@ -24,4 +24,6 @@ let insertLocatioinWithChecks location =
     if stateIsColorado location
     then insert location
     else raise (System.ArgumentException("Not a valid State"))
+
+    
 //insertLocatioinWithChecks { City = "San Francisco"; State = "CA" }

@@ -1,3 +1,5 @@
+//Define our model
+
 type Location = {
     City : string
     State : string
