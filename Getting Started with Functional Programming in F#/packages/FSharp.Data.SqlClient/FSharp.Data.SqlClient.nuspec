@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>FSharp.Data.SqlClient</id>
+        <version>1.8.1</version>
+        <authors>Dmitry Morozov,Dmitry Sevastianov</authors>
+        <owners>Dmitry Morozov,Dmitry Sevastianov</owners>
+        <licenseUrl>http://github.com/fsprojects/FSharp.Data.SqlClient/blob/master/LICENSE.md</licenseUrl>
+        <projectUrl>http://fsprojects.github.io/FSharp.Data.SqlClient/</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/fsprojects/FSharp.Data.SqlClient/master/docs/files/img/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>SqlCommandProvider provides statically typed access to input parameters and result set of T-SQL command in idiomatic F# way.SqlProgrammabilityProvider exposes Stored Procedures, User-Defined Types and User-Defined Functions in F# code.</description>
+        <summary>SqlClient F# type providers</summary>
+        <releaseNotes>* Issue #185</releaseNotes>
+        <copyright>Copyright 2015</copyright>
+        <tags>F# fsharp data typeprovider sql</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System.Data" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml" targetFramework="" />
+        </frameworkAssemblies>
+        <references>
+            <reference file="FSharp.Data.SqlClient.dll" />
+        </references>
+    </metadata>
+</package>

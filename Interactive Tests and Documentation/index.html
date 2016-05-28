@@ -1,0 +1,522 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Interactive Tests &amp; Documentation</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/vs.css">
+
+        <style type="text/css">
+        p { text-align: left; }
+        </style>
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!-- Flare demos -->
+		<link rel="stylesheet" href="demo/demos.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Interactive Tests<br>&amp; Documentation</h2>
+  <h4>via QuickCheck-style Declarations</h4>
+
+  <br>
+  <a href="http://lambdaconf.us/">LambdaConf 2016</a> &mdash; <a href="http://david-peter.de">David Peter</a>
+  <br>
+  <br>
+  <br>
+  <p style="text-align:right"><small>shark.fish/talk<br>shark.fish/try</small></p>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Outline</h2>
+  <h4>From Signals to Flares</h4>
+  Defining user interfaces with Applicatives
+  <br><br>
+  <h4>FlareCheck</h4>
+  Interactive tests &amp; documentation
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Part 1</h2>
+  <h3>From <a href="https://github.com/bodil/purescript-signal">Signals</a> to <a href="https://github.com/sharkdp/purescript-flare">Flares</a></h3>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Flare: Preview</h2>
+  <pre><code data-trim class="haskell">
+pow :: Int -&gt; Int -&gt; Int
+  </code></pre>
+  <p>Define user interface and program logic:</p>
+  <pre><code data-trim class="haskell">
+pow &lt;$&gt; int &quot;Base&quot;     2
+    &lt;*&gt; int &quot;Exponent&quot; 8
+  </code></pre>
+  <div class="demo">
+    <div id="inp_motivation"></div>
+    <div id="out_motivation" class="out"></div>
+  </div>
+  <br>
+  Idea by <em>Gabriel Gonzalez</em>: <a href="http://www.haskellforall.com/2015/11/haskell-native-spreadsheets.html">typed-spreadsheet</a>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Starting point: Signals</h2>
+  <pre><code data-trim class="haskell">
+type Signal a = Time -&gt; a    -- Conceptually
+
+mousePos   :: Signal (Int, Int)
+seconds    :: Signal Int
+keyPressed :: Key -&gt; Signal Bool
+  </code></pre>
+
+  <div class="demo">
+    <div id="inp_signals"></div>
+    <div id="out_signals" class="out"></div>
+  </div>
+  <br>
+  Elm-style signals by <em>Bodil Stokke</em>: <a href="https://github.com/bodil/purescript-signal">purescript-signal</a>
+
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Signal as a functor</h2>
+
+  <pre><code data-trim class="haskell">
+drawClock :: Int -&gt; Drawing
+drawClock secs = ..
+
+animatedClock :: Signal Drawing
+animatedClock = drawClock &lt;$&gt; seconds  -- &lt;$&gt; is infix for `map`
+  </code></pre>
+
+  <div class="demo">
+    <div id="inp_clock"></div>
+    <canvas id="out_clock" width="800" height=800" style="width: 400px"></canvas>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Signal as an Applicative</h2>
+
+  <pre><code data-trim class="haskell">
+progressBar :: Number -&gt; Drawing
+progressBar percentage = ..
+
+ratio :: Signal Number
+ratio = (/) &lt;$&gt; mousePosX &lt;*&gt; windowWidth
+
+progress = progressBar &lt;$&gt; ratio
+  </code></pre>
+
+  <div class="demo">
+    <div id="inp_progress"></div>
+    <canvas id="out_progress" width="800" height=200"></canvas>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Adding input elements</h2>
+  <p>How can we build up the full user interface from an expression like:</p>
+  <pre><code data-trim class="haskell">
+pow &lt;$&gt; int &quot;Base&quot;     2
+    &lt;*&gt; int &quot;Exponent&quot; 8
+  </code></pre>
+  &rarr; Go from Signals to Flares
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>&lsquo;Annotated&rsquo; functors<br><small>(abstract interlude)</small></h2>
+  <p>Annotate a base functor '<code>f</code>' with values of type '<code>a</code>':</p>
+  <pre><code data-trim data-noescape class="haskell">
+data Ann a f b = Ann a (f b)
+
+instance Functor f =&gt; Functor (Ann a f) where
+  map g (Ann a fb) = Ann a (map g fb)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Applicative</h2>
+  <p>Is <code>Ann</code> also an applicative functor?</p>
+  <pre><code data-trim data-noescape class="haskell">
+data Ann a f b = Ann a (f b)
+  </code></pre>
+  <br>
+  <pre><code data-trim data-noescape class="haskell">
+instance Applicative f =&gt; Applicative (Ann a f) where
+  pure x = Ann <mark>???</mark> (pure x)
+  (Ann a1 f1) &lt;*&gt; (Ann a2 f2) = Ann <mark>???</mark> (f1 &lt;*&gt; f2)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Yes,</h2>
+  <p>&hellip; if we require '<code>a</code>' to be a <code><span class="hljs-type">Monoid</span></code>:</p>
+  <pre><code data-trim data-noescape class="haskell">
+data Ann a f b = Ann a (f b)
+  </code></pre>
+  <br>
+  <pre><code data-trim data-noescape class="haskell">
+instance (<mark>Monoid a</mark>, Applicative f) =&gt; Applicative (Ann a f) where
+  pure x = Ann <mark>mempty</mark> (pure x)
+  (Ann a1 f1) &lt;*&gt; (Ann a2 f2) = Ann <mark>(a1 &lt;&gt; a2)</mark> (f1 &lt;*&gt; f2)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Applicative laws</h2>
+
+  <p>Example: composition law</p>
+
+  <pre><code data-trim data-noescape class="haskell">
+pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w = u &lt;*&gt; (v &lt;*&gt; w)
+  </code></pre>
+
+  <p>Proof:</p>
+
+  <pre><code data-trim data-noescape class="haskell">
+pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w
+  = Ann mempty (pure (.)) &lt;*&gt; Ann mu fu &lt;*&gt; Ann mv fv &lt;*&gt; Ann mw fw
+  = Ann mu (pure (.) &lt;*&gt; fu) &lt;*&gt; Ann mv fv &lt;*&gt; Ann mw fw
+  = Ann (mu &lt;&gt; mv) (pure (.) &lt;*&gt; fu &lt;*&gt; fv) &lt;*&gt; Ann mw fw
+  = Ann ((mu &lt;&gt; mv) &lt;&gt; mw) (pure (.) &lt;*&gt; fu &lt;*&gt; fv &lt;*&gt; fw)
+  = Ann (mu &lt;&gt; (mv &lt;&gt; mw)) (fu &lt;*&gt; (fv &lt;*&gt; fw))
+  = Ann mu fu &lt;*&gt; Ann (mv &lt;&gt; mw) (fv &lt;*&gt; fw)
+  = Ann mu fu &lt;*&gt; (Ann mv fv &lt;*&gt; Ann mw fw)
+  = u &lt;*&gt; (v &lt;*&gt; w)
+  </code></pre>
+  <small>Note: this needs the <strong>identity</strong> and the <strong>associativity</strong> of the Monoid.</small>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Flare as annotated Signal</h2>
+  <pre><code data-trim data-noescape class="haskell">
+type Flare a = Ann [HTMLElement] Signal a
+--                      ^               ^
+--                      |               |
+--              Monoid to collect     Output
+--                 UI elements         type
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Flare components</h2>
+  <pre><code data-trim data-noescape class="haskell">
+type Label = String
+
+string  :: Label -&gt; String  -&gt; Flare String
+int     :: Label -&gt; Int     -&gt; Flare Int
+boolean :: Label -&gt; Boolean -&gt; Flare Boolean
+
+
+sayHello &lt;$&gt; string   &quot;Name&quot;    &quot;LambdaConf&quot;
+         &lt;*&gt; int      &quot;Year&quot;    2016
+         &lt;*&gt; boolean  &quot;Shout&quot;   false
+  </code></pre>
+
+  <div class="demo">
+    <div id="inp_components"></div>
+    <div id="out_components" class="out"></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Quick &amp; dirty user interfaces</h2>
+  <pre><code data-trim data-noescape class="haskell">
+plot &lt;$&gt; (numberSlider &quot;m&quot; 2.0 10.0 1.0  5.0)
+     &lt;*&gt; (numberSlider &quot;n&quot; 3.0 10.0 0.1  4.0)
+     &lt;*&gt; (numberSlider &quot;s&quot; 4.0 16.0 0.1 14.0)
+     &lt;*&gt; (color &quot;Fill color&quot; indigo)
+     &lt;*&gt; (boolean &quot;Animated&quot; false)
+     &lt;*&gt; lift animationFrame
+  </code></pre>
+
+  <div class="demo" style="overflow: hidden">
+    <div style="float:left" id="inp_superformula"></div>
+    <div style="float:right"><canvas id="out_superformula" width="800" height=800" style="width: 300px"></canvas></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Part 2</h2>
+  <h3>FlareCheck</h3>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Idea</h2>
+  <pre><code data-trim class="haskell">
+pow :: Int -&gt; Int -&gt; Int
+  </code></pre>
+  <p>Go from this:</p>
+  <pre><code data-trim class="haskell">
+flare =
+  pow &lt;$&gt; int &quot;Base&quot;     2
+      &lt;*&gt; int &quot;Exponent&quot; 8
+
+runFlare flare
+  </code></pre>
+  <p>to this:</p>
+  <pre><code data-trim class="haskell">
+flareCheck pow
+  </code></pre>
+  <p style="text-align:right">&hellip; and let the type checker do all the work.</p>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Reminder: QuickCheck</h2>
+  <pre><code data-trim class="haskell">
+class Arbitrary a where
+  arbitrary :: Gen a
+
+class Testable t where
+  test :: t -&gt; Gen Result
+
+instance (Arbitrary a, Testable t) =&gt; Testable (a -&gt; t)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>FlareCheck</h2>
+  <pre><code data-trim class="haskell">
+class Flammable a where
+  spark :: Flare a
+
+class Interactive t where
+  interactive :: Flare t -&gt; Flare Renderable
+
+instance (Flammable a, Interactive t) =&gt; Interactive (a -&gt; t)
+  </code></pre>
+</section>
+
+<!--
+  quickCheck :: (Testable t) => t -> IO ()
+  flareCheck :: (Interactive t) => t -> IO ()
+-->
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Flammable Instances</h2>
+  <pre><code data-trim class="haskell">
+Flammable Boolean
+Flammable Char
+Flammable String
+Flammable Int
+Flammable Number
+(Read a) =&gt; Flammable (List a)
+(Read a) =&gt; Flammable (Array a)
+(Flammable a) =&gt; Flammable (Maybe a)
+(Flammable a, Flammable b) =&gt; Flammable (Tuple a b)
+(Flammable a, Flammable b) =&gt; Flammable (Either a b)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Interactive Instances</h2>
+  <pre><code data-trim class="haskell">
+Interactive Boolean
+Interactive Char
+Interactive String
+Interactive Int
+Interactive Number
+(Flammable a, Interactive t) =&gt; Interactive (a -&gt; t)
+(Generic a) =&gt; Interactive (List a)
+(Generic a) =&gt; Interactive (Array a)
+(Generic a) =&gt; Interactive (Maybe a)
+(Generic a, Generic b) =&gt; Interactive (Tuple a b)
+(Generic a, Generic b) =&gt; Interactive (Either a b)
+  </code></pre>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Example</h2>
+  <pre><code data-trim class="haskell">
+length :: String -&gt; Int
+
+flareCheck length
+  </code></pre>
+  <div class="demo-flarecheck">
+    <div id="out_flarecheck_length"></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Example</h2>
+  <pre><code data-trim class="haskell">
+charCodeAt :: Int -&gt; String -&gt; Maybe Int
+
+flareCheck charCodeAt
+  </code></pre>
+  <div class="demo-flarecheck">
+    <div id="out_flarecheck_charCodeAt"></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Example</h2>
+  <pre><code data-trim class="haskell">
+filter      :: forall a. (a -&gt; Boolean) -&gt; Array a -&gt; Array a
+even        :: Int -&gt; Boolean
+
+filter even :: Array Int -&gt; Array Int
+
+flareCheck (filter even)
+  </code></pre>
+  <div class="demo-flarecheck">
+    <div id="out_flarecheck_filterEven"></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Example</h2>
+  <pre><code data-trim class="haskell">
+xor :: Boolean -&gt; Boolean -&gt; Boolean
+
+flareCheck xor
+  </code></pre>
+  <div class="demo-flarecheck">
+    <div id="out_flarecheck_xor"></div>
+  </div>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Interactive documentation</h2>
+  Example: <a href="http://sharkdp.github.io/purescript-flaredoc/">Data.Array</a> module documentation
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Thanks to &hellip;</h2>
+  <ul>
+    <li>The LambdaConf team!</li>
+    <li>All PureScript developers</li>
+    <li>Gabriel Gonzalez (idea for Flare)</li>
+    <li>Bodil Stokke (purescript-signal)</li>
+    <li>Phil Freeman (improvements in FlareCheck)</li>
+  </ul>
+</section>
+
+<!-- ###################################################################### -->
+
+<section>
+  <h2>Thanks!</h2>
+  <br>
+  <img src="img/GitHub-Mark-32px.png" style="border:0; box-shadow: none; margin: 0">&nbsp; <a href="https://github.com/sharkdp/">https://github.com/sharkdp/</a>
+</section>
+
+<!-- ########################## APPENDIX ################################## -->
+
+<section>
+  <h2>Comments about <code>Ann</code></h2>
+
+  <p>- <code><span class="hljs-type">Ann</span></code> cannot be made a (law-abiding) Monad</p>
+
+  <p>- <code><span class="hljs-type">Ann</span></code> as product of functors:</p>
+  <pre><code data-trim class="haskell">
+type Ann a f b = Product (Const a) f b
+
+instance Monoid a =&gt; Applicative (Const a)
+instance (Applicative f, Applicative g) =&gt; Applicative (Product f g)
+  </code></pre>
+  <small>(thanks to <code>/r/purescript</code>!)</small>
+</section>
+
+<!-- ###################################################################### -->
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+                transition: 'convex',
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					//{ src: 'plugin/markdown/marked.js' },
+					//{ src: 'plugin/markdown/markdown.js' },
+					//{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    // Zoom in and out with Alt+click
+                    { src: 'plugin/zoom-js/zoom.js', async: true }
+
+				]
+			});
+		</script>
+        <script src="demo/flares.js"></script>
+	</body>
+</html>
