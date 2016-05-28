@@ -1,6 +1,6 @@
 # Functional Relational Programming In UI Frameworks
 
-A talk I've given at LambdaConf 2016.
+A talk given by [Jon Eisen](http://joneisen.works) at LambdaConf 2016.
 
 ## Summary
 
