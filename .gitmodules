@@ -1,3 +1,6 @@
 [submodule "The Algebra and Dissection of Types"]
 	path = The Algebra and Dissection of Types
 	url = https://github.com/ryanorendorff/algebra_lambdaconf2016.git
+[submodule "Monstrous Names Aren't Scary"]
+	path = Monstrous Names Aren't Scary
+	url = https://github.com/nuttycom/lambdaconf-2016

@@ -1,0 +1,6 @@
+name = "delimcc"
+version = "201308"
+description = "delimited continuations in byte-code and native OCaml"
+
+archive(byte) = "delimcc.cma"
+archive(native) = "delimcc.cmxa"
